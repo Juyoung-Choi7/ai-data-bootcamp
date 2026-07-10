@@ -3,3 +3,4 @@
 
 - 사용기술 : -python 3.12
             -pandas, numpy ..
+
