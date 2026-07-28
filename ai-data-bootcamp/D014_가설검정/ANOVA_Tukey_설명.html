@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>어떤 비료가 가장 효과적일까? — ANOVA와 Tukey's HSD</title>
+<style>
+  :root {
+    --bg: #FAFAF8; --surface: #FFFFFF; --surface-2: #F1EFE8;
+    --text: #2C2C2A; --text-2: #5F5E5A; --text-muted: #898781;
+    --border: #E1E0D9; --accent-bg: #E6F1FB; --accent-text: #0C447C;
+    --success-bg: #EAF3DE; --success-text: #27500A;
+    --teal-bg: #E1F5EE; --teal-text: #085041;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    max-width: 760px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem;
+    line-height: 1.6;
+  }
+  h1 { font-size: 24px; font-weight: 500; margin: 0 0 0.3rem; }
+  .sub { color: var(--text-2); font-size: 14px; margin: 0 0 2rem; }
+  .tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem; margin-bottom: 1.5rem; }
+  .tabbtn { flex: 1; padding: 10px; border: none; background: transparent; color: var(--text-2);
+    font-size: 15px; border-radius: 8px; cursor: pointer; font-family: inherit; }
+  .tabbtn.active { background: var(--text); color: #fff; font-weight: 500; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .card { background: var(--surface-2); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem; }
+  .card p { margin: 0; }
+  .card .title { font-size: 16px; font-weight: 500; margin-bottom: 8px; }
+  .card .desc { color: var(--text-2); font-size: 14px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; margin-top: 10px; }
+  .grid2 div { background: var(--surface); border-radius: 8px; padding: 8px 10px; border: 1px solid var(--border); }
+  .accent { background: var(--accent-bg); color: var(--accent-text); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem; }
+  .accent .title { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+  .accent .desc { font-size: 13px; }
+  pre { background: #1e1e1e; color: #d4d4d4; border-radius: 8px; padding: 12px 14px;
+    font-family: Consolas, monospace; font-size: 12.5px; overflow-x: auto; margin: 0 0 1rem; }
+  .kw { color: #569cd6; }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.25rem; }
+  .stat { background: var(--surface-2); border-radius: 8px; padding: 1rem; text-align: center; }
+  .stat .label { font-size: 13px; color: var(--text-2); margin-bottom: 4px; }
+  .stat .value { font-size: 26px; font-weight: 500; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 1.25rem; }
+  th, td { padding: 8px; }
+  th { text-align: left; background: var(--surface-2); font-weight: 500; }
+  td { border-bottom: 1px solid var(--border); }
+  .sig { color: var(--accent-text); font-weight: 500; }
+  .nosig { color: var(--text-muted); }
+  .stepnote { font-size: 13px; color: var(--text-2); margin: 0 0 6px; }
+  .conclist { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.25rem; }
+  .concitem { display: flex; gap: 10px; align-items: flex-start; background: var(--teal-bg); border-radius: 8px; padding: 10px 12px; }
+  .num { background: #fff; color: var(--teal-text); border-radius: 50%; width: 22px; height: 22px;
+    display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; flex-shrink: 0; }
+  .final { background: var(--success-bg); border-radius: 12px; padding: 1rem 1.25rem; }
+  .final .title { font-size: 15px; font-weight: 500; color: var(--success-text); margin-bottom: 6px; }
+  .final .desc { font-size: 13px; color: var(--success-text); }
+  canvas { max-width: 100%; }
+</style>
+</head>
+<body>
+
+<h1>어떤 비료가 가장 효과적일까?</h1>
+<p class="sub">분산분석(ANOVA)과 Tukey's HSD 사후분석 — 세 비료(A, B, C), 각 10개 밭 실험</p>
+
+<div class="tabs">
+  <button class="tabbtn active" data-tab="0">① 개념 설명</button>
+  <button class="tabbtn" data-tab="1">② 코드 리뷰</button>
+  <button class="tabbtn" data-tab="2">③ 정리</button>
+</div>
+
+<div id="panel-0" class="panel active">
+  <div class="card">
+    <p class="title">ANOVA (분산분석)</p>
+    <p class="desc">3개 이상 그룹의 평균이 모두 같은지 한 번에 검정</p>
+    <div class="grid2">
+      <div>H₀: 모든 그룹의 평균은 같다</div>
+      <div>H₁: 적어도 하나는 다르다</div>
+    </div>
+  </div>
+  <div class="accent">
+    <p class="title">F-통계량 = 그룹 간 분산 ÷ 그룹 내 분산</p>
+    <p class="desc">그룹 간 차이가 클수록, 그룹 내 변동이 작을수록 F값이 커집니다.</p>
+  </div>
+  <div class="card">
+    <p class="title">Tukey's HSD (사후분석)</p>
+    <p class="desc">ANOVA는 "적어도 하나는 다르다"까지만 알려줍니다. 어느 쌍(A-B, A-C, B-C)이 다른지는 Tukey's HSD가 다중비교 오류를 보정하며 짚어줍니다.</p>
+  </div>
+</div>
+
+<div id="panel-1" class="panel">
+  <p class="stepnote">Q1. ANOVA 수행</p>
+  <pre><span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+f_stat, p_value = stats.f_oneway(fertilizer_a, fertilizer_b, fertilizer_c)</pre>
+
+  <div class="stats">
+    <div class="stat"><div class="label">F-통계량</div><div class="value">10.35</div></div>
+    <div class="stat"><div class="label">p-값</div><div class="value">0.000462</div></div>
+  </div>
+
+  <p class="stepnote">Q2. Tukey's HSD 사후분석</p>
+  <table>
+    <tr><th>비교</th><th style="text-align:right">평균차이</th><th style="text-align:right">p-adj</th><th style="text-align:right">결과</th></tr>
+    <tr><td>A vs B</td><td style="text-align:right">+23.68</td><td style="text-align:right">0.0006</td><td style="text-align:right" class="sig">유의미</td></tr>
+    <tr><td>A vs C</td><td style="text-align:right">+4.84</td><td style="text-align:right">0.6569</td><td style="text-align:right" class="nosig">유의미하지 않음</td></tr>
+    <tr><td>B vs C</td><td style="text-align:right">-18.83</td><td style="text-align:right">0.0054</td><td style="text-align:right" class="sig">유의미</td></tr>
+  </table>
+
+  <p class="stepnote">Q3~Q4. H₀ 가정 하 시뮬레이션 (5,000회)</p>
+  <div style="position:relative;width:100%;height:240px">
+    <canvas id="fchart"></canvas>
+  </div>
+</div>
+
+<div id="panel-2" class="panel">
+  <div class="conclist">
+    <div class="concitem"><span class="num">1</span><p>ANOVA 결과, 세 비료의 평균 수확량은 유의미하게 다릅니다 (F=10.35, p=0.000462).</p></div>
+    <div class="concitem"><span class="num">2</span><p>Tukey's HSD 결과, B 비료가 A·C보다 유의미하게 높은 수확량을 보였습니다.</p></div>
+    <div class="concitem"><span class="num">3</span><p>시뮬레이션으로 확인한 결과, 이 F값은 우연히 나올 가능성이 매우 낮았습니다.</p></div>
+  </div>
+  <div class="final">
+    <p class="title">최종 추천: B 비료 도입</p>
+    <p class="desc">단, 그룹별 표본 크기(n=10)가 작아 표본을 늘려 재검증하는 것이 바람직합니다.</p>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+  var tabs = document.querySelectorAll('.tabbtn');
+  var panels = [document.getElementById('panel-0'), document.getElementById('panel-1'), document.getElementById('panel-2')];
+  tabs.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var idx = Number(btn.dataset.tab);
+      tabs.forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      panels.forEach(function (p, i) { p.classList.toggle('active', i === idx); });
+    });
+  });
+
+  function gamma(n) { return n <= 1 ? 1 : (n - 1) * gamma(n - 1); }
+  function g(n) { return Number.isInteger(n) ? gamma(n) : Math.sqrt(2 * Math.PI / n) * Math.pow(n / Math.E, n); }
+  function betaApprox(a, b) { return g(a) * g(b) / g(a + b); }
+  function fpdf(x, d1, d2) {
+    if (x <= 0) return 0;
+    var num = Math.pow(d1 * x, d1) * Math.pow(d2, d2);
+    var den = Math.pow(d1 * x + d2, d1 + d2);
+    return Math.sqrt(num / den) / (x * betaApprox(d1 / 2, d2 / 2));
+  }
+  var xs = [];
+  for (var x = 0.05; x <= 16; x += 0.3) xs.push(x);
+  var ys = xs.map(function (v) { return fpdf(v, 2, 27) * 5000 * 0.3; });
+
+  new Chart(document.getElementById('fchart'), {
+    type: 'bar',
+    data: { labels: xs.map(function (v) { return v.toFixed(1); }), datasets: [{ data: ys, backgroundColor: '#2a78d6', borderWidth: 0 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { autoSkip: true, maxTicksLimit: 8, color: '#898781' }, grid: { display: false } },
+        y: { display: false }
+      }
+    },
+    plugins: [{
+      id: 'vline',
+      afterDraw: function (chart) {
+        var idx = xs.findIndex(function (v) { return v >= 10.35; });
+        if (idx < 0) return;
+        var xPos = chart.scales.x.getPixelForValue(idx);
+        var ctx = chart.ctx;
+        ctx.save();
+        ctx.strokeStyle = '#e34948';
+        ctx.setLineDash([5, 4]);
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(xPos, chart.chartArea.top);
+        ctx.lineTo(xPos, chart.chartArea.bottom);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }]
+  });
+</script>
+</body>
+</html>
