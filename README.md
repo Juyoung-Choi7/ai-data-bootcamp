@@ -59,6 +59,11 @@ Python을 기반으로 데이터 분석 및 AI/Data 관련 역량을 학습하�
 
 분석 결과를 바탕으로 배송 지연이 주로 발생하는 구간과 카테고리별 위험도를 파악하고, 운영 및 고객경험 측면의 개선 방향을 제안했습니다.
 
+관련 파일:
+- [프로젝트 README](D025olist프로젝트1/README.md)
+- [분석 노트북](D025olist프로젝트1/olist_delivery_review_analysis.ipynb)
+- [결과 정리 문서](D025olist프로젝트1/notebook/README_최종.md)
+
 ---
 
 ### 2) SQL 기반 상품 추천 로직 설계
@@ -73,6 +78,10 @@ Python을 기반으로 데이터 분석 및 AI/Data 관련 역량을 학습하�
 - IMDB 가중 평점 공식을 응용한 추천 기준 설계
 - 5가지 추천 로직 비교
 
+관련 파일:
+- [추천 시스템 보고서](D033sq1실습/amazon_recommendation_report.md)
+- [SQL 과제 파일](D033sq1실습/[%EA%B3%BC%EC%A0%9C]%20Amazon%20%EC%8B%A4%ED%8C%8C%20%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%A1%9C%20%EC%B6%94%EC%B2%9C%20%EC%8B%9C%EC%8A%A4%ED%85%8C%EB%A7%88%20%EC%84%A4%EA%B3%84%ED%95%98%EA%B8%B0.sql)
+
 ---
 
 ### 3) A/B Test 데이터 분석
@@ -83,6 +92,10 @@ A/B 테스트 데이터를 활용해 광고 인지도 상승의 통계적 유의
 - 통계적 유의성 검증
 - ROI 분석
 - 결과의 민감도 검토
+
+관련 파일:
+- [A/B 테스트 실습 폴더](D012-017기초통계가설검정/D017_abtest실습/)
+- [실습 노트북](D012-017기초통계가설검정/D017_abtest실습/abtest실습노트북.ipynb)
 
 ---
 
@@ -130,12 +143,13 @@ A/B 테스트 데이터를 활용해 광고 인지도 상승의 통계적 유의
 - [D010-011 데이터 스크래핑](ai-data-bootcamp/D010-011%EB%8D%B0%EC%9D%B4%ED%84%B0%EC%8A%A4%ED%81%AC%EB%9E%98%ED%95%91/)
 - [D012-017 기초 통계 & 가설검정](ai-data-bootcamp/D012-017%EA%B8%B0%EC%B4%88%ED%86%B5%EA%B3%84%EA%B0%80%EC%84%A4%EA%B2%80%EC%A0%95/)
 - [D018-23 머신러닝](ai-data-bootcamp/D018-23%EB%A8%B8%EC%8B%A0%EB%9F%AC%EB%8B%9D/)
-- [D025 Olist 프로젝트](ai-data-bootcamp/D025olist%ED%94%84%EB%A1%9C%EC%A0%84%ED%8A%B8%ED%8A%B81/)- [D033 SQL 실습](D033sq1%EC%8B%A4%EC%8A%B5/)
+- [D025 Olist 프로젝트](D025olist프로젝트1/)
+- [D033 SQL 실습](D033sq1실습/)
+
 ---
 
 ## Contact
 
-- Email: your.email@example.com
-- GitHub: github.com/yourusername
-- LinkedIn: linkedin.com/in/yourprofile
+- Email: choij917@naver.com
+- GitHub: github.com/Juyoung-Choi7/ai-data-bootcamp
 
