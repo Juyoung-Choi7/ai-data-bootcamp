@@ -130,8 +130,7 @@ A/B 테스트 데이터를 활용해 광고 인지도 상승의 통계적 유의
 - [D010-011 데이터 스크래핑](ai-data-bootcamp/D010-011%EB%8D%B0%EC%9D%B4%ED%84%B0%EC%8A%A4%ED%81%AC%EB%9E%98%ED%95%91/)
 - [D012-017 기초 통계 & 가설검정](ai-data-bootcamp/D012-017%EA%B8%B0%EC%B4%88%ED%86%B5%EA%B3%84%EA%B0%80%EC%84%A4%EA%B2%80%EC%A0%95/)
 - [D018-23 머신러닝](ai-data-bootcamp/D018-23%EB%A8%B8%EC%8B%A0%EB%9F%AC%EB%8B%9D/)
-- [D025 Olist 프로젝트](ai-data-bootcamp/D025olist%ED%94%84%EB%A1%9C%EC%A0%84%ED%8A%B8%ED%8A%B81/)
-
+- [D025 Olist 프로젝트](ai-data-bootcamp/D025olist%ED%94%84%EB%A1%9C%EC%A0%84%ED%8A%B8%ED%8A%B81/)- [D033 SQL 실습](D033sq1%EC%8B%A4%EC%8A%B5/)
 ---
 
 ## Contact
